@@ -2,6 +2,7 @@
 using Mono.Cecil.Cil;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -15,9 +16,24 @@ public class Player : MonoBehaviour
     public float bombSpacing;
     public float cornerBombDistance = 1f;
     public float warpRatio = 0.5f;
-
+   
+    public Transform asteroidParent;
+    public List<Transform> asteroids = new List<Transform>();
+    void Start()
+    {
+        if (asteroidParent != null)
+        {
+         
+            foreach (Transform child in asteroidParent)
+            {
+                asteroids.Add(child);
+            }
+        }
+    }
     void Update()
     {
+        
+        DetectAsteroids(10f, asteroids);
 
         float speed = 0.5f;
         Vector2 targetPosition = enemyTransform.position;
@@ -81,9 +97,26 @@ public class Player : MonoBehaviour
     {
         Vector2 startPoint = transform.position;
         Vector2 endPoint = target.position;
-
         Vector2 newPosition = Vector2.Lerp(startPoint, endPoint, ratio);
         transform.position = new Vector2(newPosition.x,newPosition.y);
+    }
+
+    public void DetectAsteroids(float inMaxRange, List<Transform> inAsteroids)
+    {
+        if (inAsteroids == null) return;
+
+        foreach(Transform asteroid in inAsteroids)
+        {
+            if (asteroid == null) continue;
+            float distance = Vector3.Distance(transform.position, asteroid.position);
+            if(distance <= inMaxRange)
+            {
+                Vector3 direction = (asteroid.position - transform.position).normalized;
+                Vector3 lineEnd = transform.position + direction * 2.5f;
+                Debug.DrawLine(transform.position, lineEnd, Color.yellow);
+
+            }
+        }
     }
 } 
      
