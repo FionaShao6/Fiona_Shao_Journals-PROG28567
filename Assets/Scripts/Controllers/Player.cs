@@ -1,4 +1,5 @@
-﻿using Mono.Cecil.Cil;
+﻿using JetBrains.Annotations;
+using Mono.Cecil.Cil;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,7 +14,7 @@ public class Player : MonoBehaviour
     public int numberOfBombs;
     public float bombSpacing;
     public float cornerBombDistance = 1f;
-    
+    public float warpRatio = 0.5f;
 
     void Update()
     {
@@ -39,19 +40,23 @@ public class Player : MonoBehaviour
         {
             SpawnBombOnRandomCorner(cornerBombDistance);
         }
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            WarpPlayer (enemyTransform, warpRatio);
+        }
     }
 
     public void SpawnBombAtOffset(Vector3 inOffset)
     {
-        
+
         Vector2 spawnPosition = transform.position + inOffset;
-        Instantiate(bombPrefab,spawnPosition,Quaternion.identity,bombsTransform);
+        Instantiate(bombPrefab, spawnPosition, Quaternion.identity, bombsTransform);
 
     }
     public void SpawnBombTrail(float inBombSpacing, int inNumberOfBombs)
     {
         Vector2 backwardDirection = -transform.up;
-        for(int i=0; i < inNumberOfBombs; i++)
+        for (int i = 0; i < inNumberOfBombs; i++)
         {
             float distance = (i + 1) * inBombSpacing;
             Vector2 bombOffset = backwardDirection * distance;
@@ -64,7 +69,7 @@ public class Player : MonoBehaviour
         cornerDirection[0] = new Vector2(1, 1).normalized;
         cornerDirection[1] = new Vector2(-1, 1).normalized;
         cornerDirection[2] = new Vector2(-1, -1).normalized;
-        cornerDirection[3] = new Vector2(1,- 1).normalized;
+        cornerDirection[3] = new Vector2(1, -1).normalized;
 
         int randomIndex = Random.Range(0, cornerDirection.Length);
 
@@ -72,4 +77,16 @@ public class Player : MonoBehaviour
         SpawnBombAtOffset(bombOffset);
     }
 
-}
+    public void WarpPlayer(Transform target, float ratio)
+    {
+        Vector2 startPoint = transform.position;
+        Vector2 endPoint = target.position;
+
+        Vector2 newPosition = Vector2.Lerp(startPoint, endPoint, ratio);
+        transform.position = new Vector2(newPosition.x,newPosition.y);
+    }
+} 
+     
+    
+
+
