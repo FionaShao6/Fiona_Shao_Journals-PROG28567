@@ -9,6 +9,9 @@ public class Player : MonoBehaviour
     public Transform enemyTransform;
     public GameObject bombPrefab;
     public Transform bombsTransform;
+    public Vector2 bombOffset;
+    public int numberOfBombs;
+    public float bombSpacing;
 
     void Update()
     {
@@ -24,17 +27,30 @@ public class Player : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.B))
         {
-            SpawnBombAtOffset(new Vector3(0, 1));
+            SpawnBombAtOffset(bombOffset);
         }
-
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            SpawnBombTrail(bombSpacing, numberOfBombs);
+        }
     }
 
-    void SpawnBombAtOffset(Vector3 inOffset)
+    public void SpawnBombAtOffset(Vector3 inOffset)
     {
-        //Vector2 bsPos = transform.position + inOffset;
-        Vector2 spawnposition = transform.position + inOffset;
-        Instantiate(bombPrefab,inOffset,Quaternion.identity);
+        
+        Vector2 spawnPosition = transform.position + inOffset;
+        Instantiate(bombPrefab,spawnPosition,Quaternion.identity,bombsTransform);
 
+    }
+    public void SpawnBombTrail(float inBombSpacing, int inNumberOfBombs)
+    {
+        Vector2 backwardDirection = -transform.up;
+        for(int i=0; i < inNumberOfBombs; i++)
+        {
+            float distance = (i + 1) * inBombSpacing;
+            Vector2 bombOffset = backwardDirection * distance;
+            SpawnBombAtOffset(bombOffset);
+        }
     }
 
 }
