@@ -12,6 +12,8 @@ public class Player : MonoBehaviour
     public Vector2 bombOffset;
     public int numberOfBombs;
     public float bombSpacing;
+    public float cornerBombDistance = 1f;
+    
 
     void Update()
     {
@@ -33,6 +35,10 @@ public class Player : MonoBehaviour
         {
             SpawnBombTrail(bombSpacing, numberOfBombs);
         }
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            SpawnBombOnRandomCorner(cornerBombDistance);
+        }
     }
 
     public void SpawnBombAtOffset(Vector3 inOffset)
@@ -51,6 +57,19 @@ public class Player : MonoBehaviour
             Vector2 bombOffset = backwardDirection * distance;
             SpawnBombAtOffset(bombOffset);
         }
+    }
+    public void SpawnBombOnRandomCorner(float inDistance)
+    {
+        Vector2[] cornerDirection = new Vector2[4];
+        cornerDirection[0] = new Vector2(1, 1).normalized;
+        cornerDirection[1] = new Vector2(-1, 1).normalized;
+        cornerDirection[2] = new Vector2(-1, -1).normalized;
+        cornerDirection[3] = new Vector2(1,- 1).normalized;
+
+        int randomIndex = Random.Range(0, cornerDirection.Length);
+
+        Vector2 bombOffset = cornerDirection[randomIndex] * inDistance;
+        SpawnBombAtOffset(bombOffset);
     }
 
 }
