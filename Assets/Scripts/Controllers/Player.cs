@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Player : MonoBehaviour
 {
@@ -16,13 +17,22 @@ public class Player : MonoBehaviour
     public float bombSpacing;
     public float cornerBombDistance = 1f;
     public float warpRatio = 0.5f;
-   
+    public float moveSpeed = 1f;
     public Transform asteroidParent;
     public List<Transform> asteroids = new List<Transform>();
 
-    public Vector3 velocity = new Vector3(0.5f, 0, 0);
+    public Vector3 velocity = new Vector3(0, 0, 0);
+
+    public float maxSpeed= 10f;
+    public float accelerationTime = 2f;
+    public float acceleration;
+
+    public float declerationTime;
+
     void Start()
     {
+        acceleration = maxSpeed / accelerationTime;
+
         if (asteroidParent != null)
         {
          
@@ -35,7 +45,7 @@ public class Player : MonoBehaviour
     }
     void Update()
     {
-        transform.position += velocity;
+       
         DetectAsteroids(10f, asteroids);
 
         float speed = 0.5f;
@@ -63,6 +73,12 @@ public class Player : MonoBehaviour
         {
             WarpPlayer (enemyTransform, warpRatio);
         }
+        
+         PlayerMovement ();
+        
+        
+
+
     }
 
     public void SpawnBombAtOffset(Vector3 inOffset)
@@ -121,6 +137,43 @@ public class Player : MonoBehaviour
             }
         }
     }
+    
+    public void PlayerMovement( )
+    {
+        Vector2 direction = Vector2.zero;
+
+        if (Input.GetKey(KeyCode.LeftArrow))
+        {
+            direction+= Vector2.left;
+        }
+       
+        if (Input.GetKey(KeyCode.RightArrow))
+        {
+            direction += Vector2.right;
+        }
+      
+        if (Input.GetKey(KeyCode.UpArrow))
+        {
+            direction += Vector2.up;
+        }
+     
+        if (Input.GetKey(KeyCode.DownArrow))
+        {
+            direction += Vector2.down;
+        }
+     
+        velocity += (Vector3)direction.normalized * acceleration*Time.deltaTime;
+
+        transform.position += velocity * Time.deltaTime;
+
+        
+
+
+    }
+
+
+    
+
 } 
      
     
