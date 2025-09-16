@@ -19,6 +19,8 @@ public class Player : MonoBehaviour
    
     public Transform asteroidParent;
     public List<Transform> asteroids = new List<Transform>();
+
+    public Vector3 velocity = new Vector3(0.5f, 0, 0);
     void Start()
     {
         if (asteroidParent != null)
@@ -29,10 +31,11 @@ public class Player : MonoBehaviour
                 asteroids.Add(child);
             }
         }
+       // transform.position += new Vector3(1, 0, 0);
     }
     void Update()
     {
-        
+        transform.position += velocity;
         DetectAsteroids(10f, asteroids);
 
         float speed = 0.5f;
