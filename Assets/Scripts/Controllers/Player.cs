@@ -27,11 +27,13 @@ public class Player : MonoBehaviour
     public float accelerationTime = 2f;
     public float acceleration;
 
-    public float declerationTime;
-
+    public float deceleration;
+    public float decelerationTime = 2f;
+    bool hasInput = false;
     void Start()
     {
         acceleration = maxSpeed / accelerationTime;
+        deceleration = maxSpeed / decelerationTime;
 
         if (asteroidParent != null)
         {
@@ -161,10 +163,89 @@ public class Player : MonoBehaviour
         {
             direction += Vector2.down;
         }
-     
-        velocity += (Vector3)direction.normalized * acceleration*Time.deltaTime;
 
-        transform.position += velocity * Time.deltaTime;
+        //When the player presses the arrow keys: the player gradually accelerates to the maximum speed.
+        //When the player releases the arrow keys: the player gradually decelerates to a stop.
+        if (Input.GetKey(KeyCode.LeftArrow) ||
+           Input.GetKey(KeyCode.RightArrow) ||
+           Input.GetKey(KeyCode.UpArrow) ||
+           Input.GetKey(KeyCode.DownArrow))
+        {
+            hasInput = true;
+        }
+        if (hasInput)
+        {
+            Vector3 targetVelocity = (Vector3)direction * maxSpeed;
+
+            // the speed that can be increased per frame
+            float speedStep = acceleration * Time.deltaTime;
+
+            //// Process speed in each direction to ensure that the target speed is not exceeded
+           
+            // X direction
+            if (velocity.x < targetVelocity.x)
+            {
+                velocity.x += speedStep;
+                // Prevent exceeding target speed
+                if (velocity.x > targetVelocity.x)
+                    velocity.x = targetVelocity.x;
+            }
+            else if (velocity.x > targetVelocity.x)
+            {
+                velocity.x -= speedStep;
+                // Prevent falling below target speed
+                if (velocity.x < targetVelocity.x)
+                    velocity.x = targetVelocity.x;
+            }
+
+            // Y derection
+            if (velocity.y < targetVelocity.y)
+            {
+                velocity.y += speedStep;
+                if (velocity.y > targetVelocity.y)
+                    velocity.y = targetVelocity.y;
+            }
+            else if (velocity.y > targetVelocity.y)
+            {
+                velocity.y -= speedStep;
+                if (velocity.y < targetVelocity.y)
+                    velocity.y = targetVelocity.y;
+            }
+        }
+        ///// Deceleration control
+        else
+        {
+            // calculate the deceleration amount for this frame
+            float slowDownStep = deceleration * Time.deltaTime;
+
+            // X derection
+            if (velocity.x > 0)
+            {
+                velocity.x -= slowDownStep;
+                if (velocity.x < 0) velocity.x = 0; // prevent reverse movement
+            }
+            else if (velocity.x < 0)
+            {
+                velocity.x += slowDownStep;
+                if (velocity.x > 0) velocity.x = 0;
+            }
+
+            // Y derection 
+            if (velocity.y > 0)
+            {
+                velocity.y -= slowDownStep;
+                if (velocity.y < 0) velocity.y = 0;
+            }
+            else if (velocity.y < 0)
+            {
+                velocity.y += slowDownStep;
+                if (velocity.y > 0) velocity.y = 0;
+            }
+        }
+
+    
+
+    transform.position += velocity * Time.deltaTime;
 
         
 
