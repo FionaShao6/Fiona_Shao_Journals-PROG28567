@@ -3,6 +3,7 @@ using Mono.Cecil.Cil;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -30,6 +31,16 @@ public class Player : MonoBehaviour
     public float deceleration;
     public float decelerationTime = 2f;
     bool hasInput = false;
+
+    float circlePoint;
+    float radarRadius = 2f;
+
+    public GameObject explosionPrefab;
+    public GameObject fragmentPrefab;
+    public int fragmentCount = 6;
+    public float minFragmentSpeed = 3f;
+    public float maxFragmentSpeed = 6f;
+
     void Start()
     {
         acceleration = maxSpeed / accelerationTime;
@@ -252,8 +263,65 @@ public class Player : MonoBehaviour
 
     }
 
+    public void Radar()
+    {
 
-    
+        Vector2 centerPoint = transform.position;
+        float angleStep = 360f / circlePoint;
+
+        for(int i = 0; circlePoint>=i; i++)
+        {
+            
+        }
+
+
+    }
+
+    public void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "Planet")
+        {
+            Explode();
+        }
+    }
+
+    public void Explode()
+    {
+        PlayExplodeSound();
+        SpawnFragments();
+        Destroy(gameObject);
+    }
+    public void PlayExplodeSound()
+    {
+        if (explosionPrefab != null)
+        {
+            GameObject explosion = Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+            Destroy(explosion, 1f);
+        }
+    }
+
+    public void SpawnFragments()
+    {
+        for (int i = 0; i < fragmentCount; i++)
+        {
+            GameObject fragment = Instantiate(fragmentPrefab, transform.position, Quaternion.identity);
+            //Add random direction to fragments
+            float randomX = Random.Range(-2f, 2f);
+            float randomY = Random.Range(-2f, 2f);
+            Vector2 randomDirection = new Vector2(randomX, randomY).normalized;
+
+            Rigidbody2D fragmentRb = fragment.GetComponent<Rigidbody2D>();
+            if (fragmentRb != null)
+            {
+
+                float randomSpeed = Random.Range(minFragmentSpeed, maxFragmentSpeed);
+
+                fragmentRb.velocity = randomDirection * randomSpeed;
+            }
+
+            Destroy(fragment, 5f);
+        }
+    }
 
 } 
      
