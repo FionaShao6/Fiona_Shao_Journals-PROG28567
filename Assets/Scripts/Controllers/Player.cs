@@ -6,6 +6,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static Codice.Client.Common.EventTracking.TrackFeatureUseEvent.Features.DesktopGUI.Filters;
 
 public class Player : MonoBehaviour
 {
@@ -33,7 +34,9 @@ public class Player : MonoBehaviour
     bool hasInput = false;
 
     float circlePoint;
-    float radarRadius = 2f;
+    /// <summary>
+    /// float radarRadius = 2f;
+    /// </summary>
 
     public GameObject explosionPrefab;
     public GameObject fragmentPrefab;
@@ -283,20 +286,24 @@ public class Player : MonoBehaviour
         {
             Explode();
         }
+        Debug.Log("touched：" + collision.tag);
+
+       
     }
 
     public void Explode()
     {
-        PlayExplodeSound();
-        SpawnFragments();
-        Destroy(gameObject);
+        PlayExplodeEffect();
+        Invoke("SpawnFragments",0.1f);
+        Debug.Log("Player start destroy");
+        Destroy(gameObject,0.2f);
     }
-    public void PlayExplodeSound()
+    public void PlayExplodeEffect()
     {
         if (explosionPrefab != null)
         {
             GameObject explosion = Instantiate(explosionPrefab, transform.position, Quaternion.identity);
-            Destroy(explosion, 1f);
+            Destroy(explosion, 0.5f);
         }
     }
 
@@ -306,8 +313,8 @@ public class Player : MonoBehaviour
         {
             GameObject fragment = Instantiate(fragmentPrefab, transform.position, Quaternion.identity);
             //Add random direction to fragments
-            float randomX = Random.Range(-2f, 2f);
-            float randomY = Random.Range(-2f, 2f);
+            float randomX = Random.Range(-8f, 8f);
+            float randomY = Random.Range(-8f, 8f);
             Vector2 randomDirection = new Vector2(randomX, randomY).normalized;
 
             Rigidbody2D fragmentRb = fragment.GetComponent<Rigidbody2D>();
@@ -316,15 +323,12 @@ public class Player : MonoBehaviour
 
                 float randomSpeed = Random.Range(minFragmentSpeed, maxFragmentSpeed);
 
-                fragmentRb.velocity = randomDirection * randomSpeed;
+                fragmentRb.linearVelocity = randomDirection * randomSpeed;
+                fragmentRb.angularVelocity = Random.Range(-360f, 360f);
             }
 
             Destroy(fragment, 5f);
         }
     }
 
-} 
-     
-    
-
-
+}     
